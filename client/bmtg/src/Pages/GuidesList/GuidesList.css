@@ -1,0 +1,23 @@
+.guidePageWrapper{
+    padding: 20px;
+}
+.pageHeader{
+    background-color: #ffffff;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 90px;
+    left: 0;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    z-index: 10;
+    box-shadow: 3px 3px 20px rgba(0, 0, 0, 0.2);
+    visibility: 0;
+    opacity: 0;
+    transition: 0.2s;
+}
+.pageHeader.active{
+    visibility: 1;
+    opacity: 1;
+    height: 75px;
+}
