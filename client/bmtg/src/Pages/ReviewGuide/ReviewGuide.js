@@ -15,21 +15,21 @@ function ReviewGuide() {
     const [button3, setButton3] = useState(false);
     const {guideId} = useParams();
     const rate = (e) => {
-        var classname = e.target.className;
-        var star = parseInt(classname.split(" ")[2][4]);
-        for (var i = 1; i <= star; ++i) {
-            var starSpan = document.getElementsByClassName("star" + i)[0];
+        let classname = e.target.className;
+        let star = parseInt(classname.split(" ")[2][4]);
+        for (let i = 1; i <= star; ++i) {
+            let starSpan = document.getElementsByClassName("star" + i)[0];
             starSpan.style.color = "orange";
         }
-        for (i = star + 1; i <= 5; ++i) {
-            var starSpan2 = document.getElementsByClassName("star" + i)[0];
+        for (let i = star + 1; i <= 5; ++i) {
+            let starSpan2 = document.getElementsByClassName("star" + i)[0];
             starSpan2.style.color = "black";
         }
         setStars(star);
     };
 
-    const submit = (e) => {
-        var ok = 1;
+    const submit = () => {
+        let ok = 1;
         if (stars === 0) {
             setStarsErr("Please give some stars");
             ok = 0;
@@ -63,7 +63,6 @@ function ReviewGuide() {
                 window.location.href = '/guide/' + guideId + '/reviews'
             })
 
-            // console.log(stars, review, arr)
         }
     };
 

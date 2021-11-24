@@ -6,11 +6,10 @@ import {getAccessToken} from "./jwtparser";
 
 export const makePostRequest = async (url, data, contentType) => {
     const accessToken = getAccessToken()
-    const res = await axios.post(url, data, {
+    return await axios.post(url, data, {
         headers: {
             'Content-Type': contentType,
             'Authorization': 'Bearer ' + accessToken
         }
     })
-    console.log(res)
 }

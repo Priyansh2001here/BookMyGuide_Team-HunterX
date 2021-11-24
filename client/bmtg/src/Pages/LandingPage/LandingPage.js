@@ -2,16 +2,16 @@ import React, {useEffect} from "react";
 import {Link} from "react-router-dom";
 import './LandingPage.css'
 import axios from "axios";
+import DJANGO_URL from "../../constants";
 
 
 function LandingPage() {
     window.localStorage.setItem("currentCity", "New Delhi")
 
     function handleCredentialResponse(response) {
-        axios.post("http://localhost:8000/accounts/oauth/login", {
+        axios.post(DJANGO_URL + "/accounts/oauth/login", {
             "token": response.credential
         }).then(res => {
-            console.log(res)
             window.localStorage.setItem("tokens", JSON.stringify(res.data))
             window.location.replace("/app")
         })
@@ -19,15 +19,25 @@ function LandingPage() {
     }
 
     useEffect(() => {
-        window.google.accounts.id.initialize({
-            client_id: "721386340363-t8guun6ifvpdldqucfpnskaqet3sbnan.apps.googleusercontent.com",
-            callback: handleCredentialResponse
-        });
-        window.google.accounts.id.renderButton(
-            document.getElementById("buttonDiv"),
-            {theme: "outline", size: "large"}  // customization attributes
-        );
-        window.google.accounts.id.prompt();
+        window.onload = () => {
+            window.google.accounts.id.initialize({
+                client_id: "721386340363-t8guun6ifvpdldqucfpnskaqet3sbnan.apps.googleusercontent.com",
+                callback: handleCredentialResponse
+            });
+            window.google.accounts.id.renderButton(
+                document.getElementById("buttonDiv"),
+                {theme: "outline", size: "large"}  // customization attributes
+            );
+            window.google.accounts.id.prompt();
+           
+        }
+        const token = JSON.parse(localStorage.getItem('tokens'))
+        if (token){
+            if (token.access_token){
+                window.location.replace('/app');
+            }
+        }
+        
     })
 
     return (

@@ -5,7 +5,7 @@ function success(pos) {
     let lng = crd.longitude.toString();
     let coordinates = [lat, lng];
     getCity(coordinates);
-    return;
+
   }
 
   function error(err) {
@@ -13,7 +13,6 @@ function success(pos) {
   }
 
   export function getCoordintes() {
-    console.log('Working')
     let options = {
       enableHighAccuracy: true,
       timeout: 10000,

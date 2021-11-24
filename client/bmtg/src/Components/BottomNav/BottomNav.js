@@ -2,33 +2,41 @@ import React from "react";
 import {NavLink} from "react-router-dom";
 import "./BottomNav.css";
 
-function BottomNav() {
+function BottomNav({userObject}) {
     return (
         <div className="bottomBar flex flex-sa flex-alignCenter">
             <NavLink
                 to="/app"
                 style={{textDecoration: "none"}}
-                activeClassName="active"
-                className="flex flex-center bottomBarIcon"
+                className={({isActive}) => (
+                    isActive ? "flex flex-center bottomBarIcon active" : "flex flex-center bottomBarIcon"
+                )}
             >
                 <i className="fa fa-home"/>
             </NavLink>
             <NavLink
-                to="/designtour"
+                to="/favourites"
                 style={{textDecoration: "none"}}
-                activeClassName="active"
-                className="flex flex-center bottomBarIcon"
+
+                className={({isActive}) => (
+                    isActive ? "flex flex-center bottomBarIcon active" : "flex flex-center bottomBarIcon"
+                )}
+
             >
-                <i className="fa fa-gift"/>
+                <i className="fa fa-heart"/>
             </NavLink>
 
             <NavLink
-                to="/beapartner"
+                to={userObject.hasOwnProperty('partner_is_verified') ? "/partner/dashboard" : "/beapartner"}
                 style={{textDecoration: "none"}}
-                activeClassName="active"
-                className="flex flex-center bottomBarIcon "
+
+                className={({isActive}) => (
+                    isActive ? "flex flex-center bottomBarIcon active" : "flex flex-center bottomBarIcon"
+                )}
+
             >
-                <i className="fa fa-handshake"/>
+                {userObject.hasOwnProperty('partner_is_verified') ? <i className="fa fa-tachometer-alt"/> :
+                    <i className="fa fa-handshake"/>}
             </NavLink>
 
 

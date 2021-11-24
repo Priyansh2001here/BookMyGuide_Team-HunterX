@@ -5,24 +5,25 @@ import "./Reviews.css";
 import {makeGetRequest} from "../../makeGetRequest";
 import DJANGO_URL from "../../constants";
 import {useParams} from "react-router-dom";
+import { getAccessToken, parseJwt } from "../../jwtparser";
 
 function Reviews() {
     const [reviews, setReviews] = useState([]);
     const {guideId} = useParams();
 
-    useEffect(async () => {
-        const res = await makeGetRequest(DJANGO_URL + "/reviews/create?guide=" + guideId);
-
-        setReviews(res.data)
-
-
-    }, [])
+    useEffect(() => {
+        async function fetchReveiws(){
+            const res = await makeGetRequest(DJANGO_URL + "/reviews/create?guide=" + guideId);
+            setReviews(res.data)
+        }
+        fetchReveiws()
+    }, [guideId])
     return (
         <div className="reviews">
             <PageHeader
                 pageTitle={
                     <>
-                        Nmn's <span style={{color: "#f78383"}}>Reviews</span>
+                        {parseJwt(getAccessToken()).full_name.split(' ')[0] + `'s `} <span style={{color: "#f78383"}}>Reviews</span>
                     </>
                 }
                 rightIcon="fa fa-filter"

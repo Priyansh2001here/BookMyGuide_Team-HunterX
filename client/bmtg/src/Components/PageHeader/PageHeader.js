@@ -1,8 +1,8 @@
-import React, {useEffect, useRef} from "react";
+import React, { useEffect, useRef } from "react";
 import BackButton from "../BackButton/BackButton";
 import UtilityRightButton from "../UtilityRightButton/UtilityRightButton";
 
-function PageHeader({ pageTitle, rightIcon }) {
+function PageHeader({ pageTitle, rightIcon, type, onClickFn }) {
   const myref = useRef();
 
   useEffect(() => {
@@ -23,7 +23,12 @@ function PageHeader({ pageTitle, rightIcon }) {
       <div ref={myref} className="pageHeader"></div>
       <BackButton positionType="fixed" />
       {rightIcon && (
-        <UtilityRightButton iconType={rightIcon} positionType="fixed" />
+        <UtilityRightButton
+          iconType={rightIcon}
+          positionType="fixed"
+          type={type}
+          onClickFn={onClickFn}
+        />
       )}
       <h3
         style={{
@@ -33,6 +38,8 @@ function PageHeader({ pageTitle, rightIcon }) {
           left: "50%",
           transform: "translateX(-50%)",
           zIndex: "100",
+          textAlign:"center",
+          width:"290px"
         }}
       >
         {pageTitle}

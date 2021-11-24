@@ -5,7 +5,7 @@ function GeneralDetails({nextStep, values, handleChange}) {
     const [cityErr, setCityErr] = useState("");
     const [phoneErr, setPhoneErr] = useState("");
     const checkDetails = () => {
-        var ok = 1;
+        let ok = 1;
         if (values.state === "") {
             setStateErr("Enter your State Name");
             ok = 0;

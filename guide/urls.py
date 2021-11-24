@@ -15,5 +15,6 @@ urlpatterns = [
     path('<int:pk>/availability', views.PackageAvailabilityView.as_view()),
     path('dashboard', views.TourGuideDashboard.as_view()),
     path('get-location', views.LocationView.as_view()),
-    path('search', views.search_view)
+    path('search', views.search_view),
+    path('update', views.PackageUpdateView.as_view())
 ]

@@ -1,6 +1,6 @@
 import React from "react";
 
-function SlotModalPerson({ name, imgUrl, contact, people, price, startTime, date }) {
+function SlotModalPerson({ name, imgUrl, people, price}) {
   return (
     <div className="slotModal__person">
       <div className="slotModal__personImg">

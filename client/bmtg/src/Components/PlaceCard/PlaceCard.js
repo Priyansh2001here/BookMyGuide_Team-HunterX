@@ -1,14 +1,13 @@
 import React from "react";
 import {Link} from 'react-router-dom'
 import './PlaceCard.css'
-import DJANGO_URL from "../../constants";
 
 function PlaceCard({data}) {
   return (
   
     <Link to={"/place/" + data.id} style={{textDecoration:"none",color:"black"}} className="tourList">
       <img
-        src={DJANGO_URL + data.image}
+        src={data.image}
         alt={data.place_name}
       />
       <div className="flex flex-sb flex-alignCenter">

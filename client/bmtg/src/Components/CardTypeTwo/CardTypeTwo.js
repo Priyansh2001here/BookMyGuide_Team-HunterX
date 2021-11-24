@@ -1,13 +1,10 @@
-import React, {useEffect, useState} from "react";
-import {Link, useParams} from "react-router-dom";
+import React from "react";
+import {Link} from "react-router-dom";
 import "./CardTypeTwo";
-import {makeGetRequest} from "../../makeGetRequest";
 
-function CardTypeTwo({link, data}) {
-
-
+function CardTypeTwo({link,isReview,data}) {
     return (
-        <Link to={link} style={{textDecoration: "none", color: "black"}}>
+        <Link to={!isReview ? link : ''} style={{textDecoration: "none", color: "black"}}>
             <div className="flex" style={{
                 borderRadius: "15px",
                 padding: "10px",
@@ -31,7 +28,13 @@ function CardTypeTwo({link, data}) {
                 <div style={{width: "65%"}}>
                     <div className="flex flex-alignCenter flex-sb">
                         <h3>{data.user.name}</h3>
-                        <i className="fa fa-angle-right" style={{color: "#f78383", fontSize: "20px"}}></i>
+                        {!isReview && (
+              <i
+                className="fa fa-angle-right"
+                style={{ color: "#f78383", fontSize: "20px" }}
+              ></i>
+            )}
+           
                     </div>
                     <p style={{color: "gray", fontSize: "14px", marginTop: "4px"}}><i
                         className="fa fa-map-marker-alt"></i> {data.place.place_name}, {data.place.location.city}</p>

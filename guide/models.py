@@ -93,6 +93,17 @@ class Package(models.Model):
     fee = models.PositiveIntegerField()
 
     guide = models.OneToOneField('TourGuide', on_delete=models.CASCADE)
+"""
+
+tajmahal 
+
+guide -> group (12) 100/person
+
+slot -> 1-2 person limit 12 
+    |-> 4+ 4 +3 +1
+    |-> 12 or < 12
+
+"""
 
 
 class TourGuide(models.Model):
@@ -131,5 +142,5 @@ def send_tour_guide_creation_email(sender, instance: TourGuide, created, **kwarg
                    instance.user.user.full_name)
 
 
-post_save.connect(send_partner_creation_email, sender=Partner)
-post_save.connect(send_tour_guide_creation_email, sender=TourGuide)
+# post_save.connect(send_partner_creation_email, sender=Partner)
+# post_save.connect(send_tour_guide_creation_email, sender=TourGuide)

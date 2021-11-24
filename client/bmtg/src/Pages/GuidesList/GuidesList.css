@@ -1,7 +1,7 @@
-.guidePageWrapper{
+.guidePageWrapper {
     padding: 20px;
-}
-.pageHeader{
+  }
+  .pageHeader {
     background-color: #ffffff;
     position: fixed;
     top: 0;
@@ -15,9 +15,22 @@
     visibility: 0;
     opacity: 0;
     transition: 0.2s;
-}
-.pageHeader.active{
+  }
+  .pageHeader.active {
     visibility: 1;
     opacity: 1;
     height: 75px;
-}
+  }
+  
+  .tourGuideList__notAvailable {
+    margin-top: 12rem;
+    text-align: center;
+    letter-spacing: 3px;
+    font-size: 2rem;
+    font-weight: bold;
+  }
+  
+  .tourGuide__notAvailable__gif {
+    width: 100%;
+    margin: 20px auto;
+  }

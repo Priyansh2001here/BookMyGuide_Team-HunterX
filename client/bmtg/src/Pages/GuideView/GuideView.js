@@ -13,9 +13,9 @@ function GuideView() {
     const [guideDetails, setGuideDetails] = useState();
 
 
-    useEffect(async () => {
+    useEffect(() => {
         const res = makeGetRequest(DJANGO_URL + "/reviews/create?guide=" + guideId);
-        const url = "http://localhost:8000/guide/" + guideId
+        const url = DJANGO_URL  + "/guide/" + guideId
         const res2 = makeGetRequest(url)
 
         Promise.all([res, res2]).then((values => {
@@ -24,7 +24,7 @@ function GuideView() {
         }))
 
 
-    }, [])
+    },[guideId])
 
     return (
         <div className="guideView">

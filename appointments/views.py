@@ -19,7 +19,6 @@ class BookAppointmentView(generics.CreateAPIView):
     queryset = Appointment
     permission_classes = [IsAuthenticated]
 
-
 class GuideAvailabilityView(generics.ListAPIView):
     serializer_class = TimingsSerializer
 
@@ -41,9 +40,30 @@ class GuideAvailabilityView(generics.ListAPIView):
         if not package_obj.availability.filter(day=day_name).exists():
             return Timings.objects.none()
 
-        return Timings.objects.filter(~models.Q(id__in=models.Subquery(
-            Appointment.objects.filter(date=date, guide_id=guide_id).values('timing_id'))) & models.Q(
-            package=package_obj))
+        query = f"""select
+               package.timings_id as id,
+               package.start,
+               package.end
+        from (select timings_id, guide_timings.start, guide_timings.end, guide_package.maximum_person_limit
+              from guide_timings
+                       join guide_package_timings on guide_timings.id = guide_package_timings.timings_id
+                       join guide_package on guide_package_timings.package_id = guide_package.id
+              where guide_id = {guide_id}) package
+                 left join (select *
+                            from appointments_appointment
+                            where guide_id = {guide_id}
+                              and date = '{date.year}-{date.month}-{date.day}'::date) app
+                           on package.timings_id = app.timing_id
+        group by package.timings_id, package.start, package.end, package.maximum_person_limit
+        having coalesce(sum(app.num_of_people), 0) < package.maximum_person_limit;"""
+
+        return Timings.objects.raw(query)
+
+
+"""
+booking - date, num of ppl timing 
+timing (12-1)
+"""
 
 
 class GetAppointmentsView(generics.ListAPIView):
@@ -53,9 +73,6 @@ class GetAppointmentsView(generics.ListAPIView):
 
     def get_queryset(self):
         return Appointment.objects.all().filter(guide__user__user=self.request.user).distinct('timing')
-
-
-# http://localhost:8000/booking/get-appointments?date=2021-12-10
 
 
 class BookingDetailView(generics.RetrieveAPIView):

@@ -1,5 +1,4 @@
 import React, {useEffect} from "react";
-import {Link} from "react-router-dom";
 
 function SearchResult({data}) {
 
@@ -20,7 +19,7 @@ function SearchResult({data}) {
     }
 
     return (
-        <div className="searchResult flex" onClick={handleClick}>
+        <div className="searchResult flex" tabIndex={0} onClick={handleClick}>
 
             <div className="flex flex-sb">
                 <div>

@@ -1,5 +1,4 @@
-import axios from "axios";
-import React, {useState} from "react";
+import React, {useState,useEffect} from "react";
 import SearchResult from "./SearchResult";
 import "./SearchScreen.css";
 import {useNavigate} from 'react-router-dom'
@@ -8,56 +7,21 @@ import DJANGO_URL from "../../constants";
 
 function SearchScreen() {
     const navigate = useNavigate();
-    const [searchText, setSearchText] = useState("");
-    const [searchResults, setSearchResults] = useState([]);
-    const [allPlaces, setAllPlaces] = useState([])
-    const [loader, setLoader] = useState(false);
+    const [searchText, setSearchText] = useState('');
+    const [allPlaces, setAllPlaces] = useState([]);
     const [closeIcon, setCloseIcon] = useState(false)
-    let allPlacesSecond = [];
-
-
-    const performLiveSearch = async (searchText) => {
-
-        if (searchText.length === 0) {
-            setCloseIcon(false);
-            allPlacesSecond = []
-            setSearchResults(allPlacesSecond);
-        } else if (searchText.length === 1) {
-            setLoader(true);
-            setCloseIcon(true);
+    
+    useEffect(() => {
+        async function fetchAllPlaces(){
             const response = await makeGetRequest(DJANGO_URL + "/guide/search");
-            const temp = response.data.places.concat(response.data.citys);
-            allPlacesSecond = temp;
-            setAllPlaces(temp);
-            setLoader(false);
-            let matches = allPlacesSecond.filter((place) => {
-                const regex = new RegExp(`^${searchText}`, "gi");
-                console.log(place)
-                if (place.place_name)
-                    return place.place_name.match(regex)
-                else if (place.city)
-                    return  place.city.match(regex)
-            });
-            console.log(matches)
-            setSearchResults(matches);
-            return ;
+            let combinedArray = response.data.places.concat(response.data.citys)
+            setAllPlaces(combinedArray)
         }
-        let matches = allPlaces.filter((place) => {
-            const regex = new RegExp(`^${searchText}`, "gi");
-                if (place.place_name)
-                    return place.place_name.match(regex)
-                else if (place.city)
-                    return  place.city.match(regex)
-        });
-        console.log(matches)
-        setSearchResults(matches);
-    };
+        fetchAllPlaces();
+        document.getElementById('realSearchBox').focus()
+    }, [])
 
-    const fetchSearchResults = (e) => {
-        setSearchText(e.target.value);
-        performLiveSearch(e.target.value)
-    }
-
+ 
     return (
         <div>
             <div className="realSearchBoxContainer">
@@ -75,9 +39,13 @@ function SearchScreen() {
                 <input
                     type="text"
                     value={searchText}
-                    onInput={(e) => fetchSearchResults(e)}
+                    onChange={(e) => {
+                        setSearchText(e.target.value)
+                        e.target.value.length === 0 ? setCloseIcon(false) : setCloseIcon(true);
+                    }}
                     id="realSearchBox"
                     name=""
+                    spellCheck = 'false'
                     placeholder="Search For Places..."
                 />
                 <i
@@ -89,10 +57,24 @@ function SearchScreen() {
                         color: "#f78383",
                         fontSize: "17px",
                     }}
+                    onClick = {() => {
+                        if (closeIcon){
+                            setSearchText('');
+                            setCloseIcon(false)
+                        }else{
+
+                        }
+                    }}
                 />
             </div>
             <div className="searchResults">
-                {searchResults.map(result => <SearchResult key={result.id} data={result}/>)}
+                {allPlaces.filter(place => {
+                    if (searchText === ''){
+                        return false;
+                    }else if (place.place_name && place.place_name.toLowerCase().includes(searchText.toLowerCase())){
+                        return true;
+                    }else return !!(place.city && place.city.toLowerCase().includes(searchText.toLowerCase()));
+                }).map(result => <SearchResult key={result.place_name ? result.id : result.id+100} data={result}/>)}
             </div>
         </div>
     );

@@ -31,11 +31,15 @@ def index(request):
     refresh['image'] = user_data.get('prof_img')
     refresh['email'] = user_data.get("email")
 
-    is_partner = Partner.objects.filter(Q(user_id=obj.id) & Q(is_verified=True))
-    if is_partner.exists():
-        refresh['is_partner'] = True
-        if TourGuide.objects.filter(Q(user_id=is_partner.first().id) & Q(is_verified=True)).exists():
-            refresh['is_guide'] = True
+    partner_qs = Partner.objects.filter(user_id=obj.id)
+
+    if partner_qs.exists():
+        partner_obj = partner_qs.first()
+        refresh['partner_is_verified'] = partner_obj.is_verified
+
+        if tg_qs := TourGuide.objects.filter(user_id=partner_obj.id):
+            if tg_qs.exists():
+                refresh['tourguide_is_verified'] = tg_qs.first().is_verified
 
     return Response(
         {'access_token': str(refresh.access_token),

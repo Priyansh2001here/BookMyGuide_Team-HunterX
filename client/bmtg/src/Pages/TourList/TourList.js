@@ -3,13 +3,14 @@ import PageHeader from "../../Components/PageHeader/PageHeader";
 import "./TourList.css";
 import PlaceCard from "../../Components/PlaceCard/PlaceCard";
 import axios from "axios";
+import DJANGO_URL from "../../constants";
 
 function TourList() {
   const myref = useRef();
   const secondRef = useRef();
-  const [places, setPlaces] = useState([]);
+  const [places, setPlaces] = useState();
   const [loader, setLoader] = useState(false);
-  const [cuCity,setCucity] = useState(window.localStorage.getItem('currentCity'))
+  const [cuCity] = useState(window.localStorage.getItem('currentCity'))
   useEffect(() => {
     function fadeText() {
       if (myref && myref.current) {
@@ -64,7 +65,7 @@ function TourList() {
       setLoader(true);
       try {
         const response = await axios.get(
-          "http://localhost:8000/guide/all-places?location__state=&location__city=" + currentCity
+          DJANGO_URL + "/guide/all-places?city_name=" + currentCity
         );
 
         setLoader(false);
@@ -99,6 +100,7 @@ function TourList() {
       {loader ? (<img
               src="loaderHome.gif"
               style={{ width: "100px", height: "100px" }}
+              alt="loader"
             ></img>) : (<><div className="tourListPageWrapper">
         <PageHeader pageTitle={<>{cuCity}'s <span style={{color:"#f78383"}}>Tourlist</span></>} />
         <div
@@ -111,7 +113,7 @@ function TourList() {
           }}
         >
           <p ref={secondRef}>
-            Agra is a city in the northern state of Uttar Pradesh, India. The city is famous for being the capital of the Mughal emperors from 1526 to 1658. It is a major tourist destination for its many Mughal-era buildings such as Tāj Mahal, Agra Fort and Fatehpūr Sikrī, all three of which are UNESCO World Heritage Sites.Agra has a rich history, seen in the monuments around the city. Though the heritage of Agra city is linked with the Mughal dynasty, many other rulers also contributed to the rich past of this city.
+            {places && places.description}
           </p>
         </div>
       </div>
@@ -120,7 +122,7 @@ function TourList() {
         ref={myref}
         style={{ marginTop: "280px", flexWrap: "wrap", padding: "20px" }}
       >
-          {places.map((place) => <PlaceCard key={place.id} data={place}/>)}
+          {places && places.places.map((place) => <PlaceCard key={place.id} data={place}/>)}
       </div></>)}
     </div>
   );

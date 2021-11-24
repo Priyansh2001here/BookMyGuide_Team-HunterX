@@ -21,10 +21,13 @@ function BookingModal({open, handleClose, isCompleted, bookingId}) {
 
     const [data, setData] = useState();
 
-    useEffect(async () => {
-        const res = await makeGetRequest(DJANGO_URL + "/booking/" + bookingId)
-        setData(res.data)
-    }, [])
+    useEffect(() => {
+        async function fetchBooking(){
+            const res = await makeGetRequest(DJANGO_URL + "/booking/" + bookingId)
+            setData(res.data)
+        }
+        fetchBooking()
+    }, [bookingId])
 
     return (
         <div>
@@ -34,7 +37,6 @@ function BookingModal({open, handleClose, isCompleted, bookingId}) {
                 <div>
                     <Modal
                         open={open}
-                        // onClose={handleClose}
                         aria-labelledby="modal-modal-title"
                         aria-describedby="modal-modal-description"
                     >
@@ -72,7 +74,6 @@ function BookingModal({open, handleClose, isCompleted, bookingId}) {
                                     <button
                                         className="bookingModal__closeBtn"
                                         onClick={handleClose}
-                                        // style={isCompleted ? {width: "100%"} : {}}
                                     >
                                         Close
                                     </button>

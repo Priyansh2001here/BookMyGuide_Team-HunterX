@@ -8,7 +8,7 @@ function IdentityVerify({ nextStep, prevStep, values, handleChange }) {
   const [panPhotoErr, setPanPhotoErr] = useState("");
 
   const checkDetails = () => {
-    var ok = 1;
+    let ok = 1;
     if (values.aadhar === "") {
       setAadharErr("Enter your aadhar no.");
       ok = 0;

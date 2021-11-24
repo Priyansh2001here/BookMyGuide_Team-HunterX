@@ -52,9 +52,9 @@
     outline: none;
 }
 .listOfSlots{
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(3,2fr);
+    grid-gap:1rem;
 }
 .slot{
     padding: 10px;

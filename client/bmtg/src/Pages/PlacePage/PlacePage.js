@@ -23,7 +23,6 @@ function PlacePage() {
         const response = await axios.get(
           DJANGO_URL + "/guide/place/" + id
         );
-        console.log(response.data)
         setLoader(false);
         setPlace(response.data);
       } catch (error) {
@@ -37,7 +36,7 @@ function PlacePage() {
     return () => {
       source.cancel();
     };
-  }, []);
+  }, [id]);
   return (
     <div
     style={
@@ -54,6 +53,7 @@ function PlacePage() {
       {loader ? (<img
               src="/loaderHome.gif"
               style={{ width: "100px", height: "100px" }}
+              alt="loader"
             ></img>) : (<div className="placePageWrapper" style={{ padding: "15px" }}>
         <TopBackgroundCard name={place.place_name} imgUrl={place.image} />
         <div style={{ padding: "0px 10px 0px 10px" }}>

@@ -1,15 +1,15 @@
 import React, {useState} from "react";
 
-function BankDetails({ prevStep, handleChange, values, handleSubmit }) {
+function BankDetails({ prevStep, handleChange, values, handleSubmit,btnLoader }) {
   const [bankNameErr, setBankNameErr] = useState("");
   const [ifscErr, setIfscErr] = useState("");
   const [accHolderErr, setAccHolderErr] = useState("");
   const [bankAccErr, setBankAccErr] = useState("");
   const [confBankAccErr, setConfBankAccErr] = useState("");
   const [accVerifyErr, setAccVerifyErr] = useState("");
-
+ 
   const checkDetails = () => {
-    var ok = 1;
+    let ok = 1;
 
     if (values.bankName === "") {
       setBankNameErr("Enter your Bank Name");
@@ -154,7 +154,7 @@ function BankDetails({ prevStep, handleChange, values, handleSubmit }) {
           Prev
         </button>
         <button onClick={checkDetails} className="btn__next btn__submit">
-          Submit
+        {btnLoader ? 'Submitting...' : 'Submit'}
         </button>
       </div>
     </div>

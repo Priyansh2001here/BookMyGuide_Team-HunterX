@@ -5,6 +5,7 @@ import GeneralDetails from "./GeneralDetails";
 import IdentityVerify from "./IdentityVerify";
 import "./PartnerForm.css";
 import {makePostRequest} from "../../makePostRequest";
+import DJANGO_URL from "../../constants";
 
 function PartnerForm() {
     const [step, setStep] = useState(1);
@@ -21,8 +22,8 @@ function PartnerForm() {
     const [bankName, setBankName] = useState("");
     const [bankAccHolderName, setBankAccHolderName] = useState("");
     const [accVerifyPhoto, setAccVerifyPhoto] = useState(null);
-
-
+    const [btnLoader, setBtnLoader] = useState(false);
+ 
     const values = {
         state,
         city,
@@ -56,8 +57,8 @@ function PartnerForm() {
         fm.append('back_details_Account_number', values.bankAcc)
         fm.append('bank_account_verification_image', values.accVerifyPhoto)
         fm.append("phone_number", contact)
-
-        makePostRequest("http://localhost:8000/guide/register-partner", fm, "multipart/form-data")
+        setBtnLoader(true)
+        makePostRequest(DJANGO_URL + "/guide/register-partner", fm, "multipart/form-data")
             .then(() => window.location.replace("/app"))
     };
 
@@ -126,6 +127,7 @@ function PartnerForm() {
                         values={values}
                         handleChange={handleChange}
                         handleSubmit={handleSubmit}
+                        btnLoader = {btnLoader}
                     />
                 )}
             </div>

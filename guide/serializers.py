@@ -66,8 +66,7 @@ class PackageSerializer(serializers.ModelSerializer):
     class Meta:
         model = guide_models.Package
         fields = '__all__'
-
-    # def get_location
+        read_only_fields = ['guide']
 
     def get_timings(self, instance: Meta.model):
 
@@ -207,6 +206,8 @@ class TourGuideSerializer(TourGuideListSerializer):
     description = serializers.SerializerMethodField()
     phone_number = serializers.SerializerMethodField()
 
+    featured_review = serializers.SerializerMethodField(read_only=True)
+
     def __init__(self, *args, **kwargs):
 
         """
@@ -223,7 +224,7 @@ class TourGuideSerializer(TourGuideListSerializer):
 
     class Meta:
         model = TourGuideListSerializer.Meta.model
-        fields = TourGuideListSerializer.Meta.fields + ['description', 'phone_number']
+        fields = TourGuideListSerializer.Meta.fields + ['description', 'phone_number', 'featured_review']
 
     def get_description(self, ins: Meta.model):
         return ins.package.description
@@ -231,6 +232,12 @@ class TourGuideSerializer(TourGuideListSerializer):
     def get_phone_number(sel, ins: Meta.model):
 
         return ins.user.phone_number
+
+    def get_featured_review(self, instance: Meta.model):
+        qs = instance.review_set.all().order_by("?")
+        if qs.exists():
+            return qs[0].content
+        return ""
 
 
 class PackageAvailabilitySerializer(serializers.Serializer):
@@ -289,7 +296,7 @@ class DashboardSerializer(serializers.ModelSerializer):
 
     def get_package(self, ins: Meta.model):
         return {
-            'title':ins.package.title,
+            'title': ins.package.title,
             'description': ins.package.description
         }
 
@@ -297,7 +304,7 @@ class DashboardSerializer(serializers.ModelSerializer):
         appointments = Appointment.objects.filter(guide=instance)
         count = appointments.count()
         money_earned = appointments.aggregate(Sum('price'))
-        #TODO total money earned
+        # TODO total money earned
         return {
             "count": count,
             "money_earned": money_earned['price__sum']
@@ -334,8 +341,4 @@ class PackageCreateSerializer(serializers.ModelSerializer):
 
         return package_obj
 
-
-# class SearchSerializer(serializers.ModelSerializer):
-#
-#     class Meta:
-#
+# class PackageUpdate

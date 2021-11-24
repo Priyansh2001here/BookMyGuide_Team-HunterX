@@ -6,12 +6,12 @@ import "./UserDashboard.css";
 import axios from 'axios';
 import {makeGetRequest} from "../../makeGetRequest";
 import {getAccessToken, parseJwt} from "../../jwtparser";
+import DJANGO_URL from "../../constants";
 
 
 function UserDashboard() {
     const [btn1, setBtn1] = useState(true);
     const [btn2, setBtn2] = useState(false);
-    // const [bookings, setBookings] = useState([]);
     const [completedBookings, setCompletedBookings] = useState([]);
     const [currentBookings, setCurrentBookings] = useState([]);
     const [loader, setLoader] = useState(false);
@@ -33,13 +33,10 @@ function UserDashboard() {
         async function fetchBookings() {
             setLoader(true);
             try {
-                const response = await makeGetRequest("http://localhost:8000/accounts/dashboard");
+                const response = await makeGetRequest(DJANGO_URL + "/accounts/dashboard");
                 setUserData(parseJwt(getAccessToken()))
 
                 setLoader(false);
-                // setBookings(response.data.bookings);
-// response.data.bookings
-// completed torus
                 const completedTours = () => {
                     setCompletedBookings(response.data.bookings.filter(booking => {
                         if (booking.date < today || (booking.date === today && booking.start_time < currentISTTime)) {
@@ -48,7 +45,6 @@ function UserDashboard() {
                     }))
                 }
 
-// current bookings
                 const currentBookings = () => {
                     setCurrentBookings(response.data.bookings.filter(booking => {
                         if (booking.date > today || (booking.date === today && booking.start_time > currentISTTime)) {
@@ -73,7 +69,7 @@ function UserDashboard() {
         return () => {
             source.cancel();
         };
-    }, []);
+    }, [currentISTTime, today]);
     return (
         <div
             style={
@@ -90,6 +86,7 @@ function UserDashboard() {
             {loader ? (<img
                 src="/loaderHome.gif"
                 style={{width: "100px", height: "100px"}}
+                alt=""
             />) : (<div className="userDashboard">
                 <PageHeader
                     pageTitle={

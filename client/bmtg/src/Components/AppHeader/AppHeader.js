@@ -13,7 +13,6 @@ function AppHeader() {
         try {
             const tokens = JSON.parse(window.localStorage.getItem('tokens'))
             const access_token = tokens['access_token']
-            console.log(access_token)
             const {full_name, image} = parseJwt(access_token)
             setName(full_name)
             setImg(image)

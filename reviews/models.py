@@ -35,4 +35,4 @@ def auto_update_rating(sender, instance: Review, created, **kwargs):
             guide_obj.save()
 
 
-post_save.connect(auto_update_rating, sender=Review)
+# post_save.connect(auto_update_rating, sender=Review)

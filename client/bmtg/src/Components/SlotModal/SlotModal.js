@@ -20,17 +20,19 @@ const style = {
 
 function SlotModal({open, handleClose, timingId, startTime, date}) {
     const [bookingsData, setBookingsData] = useState([]);
-
+    // let x = new Date().toLocaleDateString();
 
     const getTimingsDateAppointmentsURL = (time_id) => {
-        // return DJANGO_URL + `/booking/get-appointmentss?timing=${time_id}&date=${date}`
-        return DJANGO_URL + `/booking/get-appointmentss?timing=${time_id}`
+        return DJANGO_URL + `/booking/get-appointmentss?timing=${time_id}&date=${date}`
     }
 
-    useEffect(async () => {
-        const res = await makeGetRequest(getTimingsDateAppointmentsURL(timingId))
-        setBookingsData(res.data)
-    }, [])
+    useEffect(() => {
+        async function fetchSlots(){
+            const res = await makeGetRequest(getTimingsDateAppointmentsURL(timingId))
+            setBookingsData(res.data)
+        }
+        fetchSlots()
+    }, [timingId])
 
     return (
         <div>
@@ -43,7 +45,7 @@ function SlotModal({open, handleClose, timingId, startTime, date}) {
                 <Box sx={style}>
                     <div className="slotModal__main">
                         <div className="slotModal__closeBtn" onClick={handleClose}>
-                            <i className="fa fa-times"></i>
+                            <i className="fa fa-times"/>
                         </div>
                         <div className="slotModal__details">
                             <h3>

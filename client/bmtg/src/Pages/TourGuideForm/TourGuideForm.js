@@ -3,6 +3,7 @@ import "./TourGuideForm.css";
 import PageHeader from '../../Components/PageHeader/PageHeader'
 import {getAccessToken, parseJwt} from "../../jwtparser";
 import {makePostRequest} from "../../makePostRequest";
+import DJANGO_URL from "../../constants";
 
 function TourGuideForm() {
     const [name, setName] = useState("");
@@ -13,6 +14,7 @@ function TourGuideForm() {
     const [placeErr, setPlaceErr] = useState("");
     const [licenseErr, setLicenseErr] = useState("");
     const [licensePhotoErr, setLicensePhotoErr] = useState("");
+    const [btnLoader, setBtnLoader] = useState(false);
 
     useEffect(() => {
         const {full_name} = parseJwt(getAccessToken())
@@ -20,7 +22,7 @@ function TourGuideForm() {
     }, [setName])
 
     const checkDetails = () => {
-        var ok = 1;
+        let ok = 1;
 
         if (name === "") {
             ok = 0;
@@ -52,11 +54,11 @@ function TourGuideForm() {
 
         if (ok) {
             const fm = new FormData()
-            console.log(typeof licensePhoto)
             fm.append("license_number", license)
             fm.append("license", licensePhoto)
             fm.append("place_name", place)
-            makePostRequest("http://localhost:8000/guide/register-guide", fm, "multipart/form-data").then(() => window.location.replace("/app"))
+            setBtnLoader(true)
+            makePostRequest(DJANGO_URL + "/guide/register-guide", fm, "multipart/form-data").then(() => window.location.replace("/app"))
         }
     };
 
@@ -103,7 +105,7 @@ function TourGuideForm() {
                 <br/>
                 <input
                     type="file"
-                    name="licensePhoto"
+                    name="licensePhoto" 
                     required
                     onChange={(e) => setLicensePhoto(e.target.files[0])}
                 />
@@ -111,7 +113,10 @@ function TourGuideForm() {
                 <p>{licensePhotoErr}</p>
                 <br/>
             </form>
-            <button onClick={checkDetails}>Submit</button>
+            <button onClick={checkDetails}>
+            {btnLoader ? 'Submitting...' : 'Submit'}
+            {btnLoader && <i className="fa fa-spinner fa-pulse" style={{marginLeft:"8px"}}/>}
+            </button>
         </div>
     );
 }

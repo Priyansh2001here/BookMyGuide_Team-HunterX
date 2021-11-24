@@ -5,7 +5,6 @@ import BookingModal from "./BookingModal";
 import DJANGO_URL from "../../constants";
 
 function BookingCard({isCompleted, data}) {
-    console.log(data.date)
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);

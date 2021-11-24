@@ -14,15 +14,17 @@ function BookGuidePage() {
     const [loader, setLoader] = useState(false);
     const [guideDetails, setGuideDetails] = useState();
     const [noOfPeople, setNoOfPeople] = useState(1);
+    const [btnLoader, setBtnLoader] = useState(false);
+    let x = new Date().toLocaleDateString();
     const [tourDate, setTourDate] = useState(
-        new Date().toISOString().split("T")[0]
+        x.slice(6, 10) + '-' + x.slice(3, 5) + '-' + x.slice(0, 2)
     );
     const [tourCharges, setTourCharges] = useState(0)
     const [selectedSlot, setSelectedSlot] = useState();
     const [selectedSlotId, setSelectedSlotId] = useState();
     const [perPersonCharge, setPerPersonCharge] = useState(0);
 
-    const [availableTimings, setAvailableTimings] = useState([]);
+    const [availableTimings, setAvailableTimings] = useState();
     const check = (e) => {
         let arr = document.getElementsByClassName("slot");
         for (let i = 0; i < arr.length; ++i) {
@@ -33,7 +35,7 @@ function BookGuidePage() {
         setSelectedSlotId(e.target.id);
     };
     const {guideId} = useParams();
-    useEffect(async () => {
+    useEffect(() => {
         const source = axios.CancelToken.source();
 
         async function fetchGuideDetails() {
@@ -43,7 +45,7 @@ function BookGuidePage() {
                     DJANGO_URL + "/guide/" + guideId
                 );
                 const timingsResponse = await axios.get(
-                    DJANGO_URL+ "/booking/get-availability/" +
+                    DJANGO_URL + "/booking/get-availability/" +
                     guideId +
                     "?date=" +
                     tourDate
@@ -65,19 +67,18 @@ function BookGuidePage() {
         return () => {
             source.cancel();
         };
-    }, []);
+    }, [guideId, tourDate]);
 
     async function handleDateChange(e) {
         setTourDate(e.target.value);
 
         const timingsResponse = await axios.get(
-            "http://localhost:8000/booking/get-availability/" +
+            DJANGO_URL + "/booking/get-availability/" +
             guideId +
             "?date=" +
             e.target.value
         );
         setAvailableTimings(timingsResponse.data);
-        console.log(availableTimings);
     }
 
     async function handleSubmit() {
@@ -87,12 +88,22 @@ function BookGuidePage() {
             timing: selectedSlotId,
             num_of_people: noOfPeople
         }
-
-        // window.localStorage.setItem("recentBookingData", JSON.stringify({...data}));
-
+        setBtnLoader(true)
         await makePostRequest(DJANGO_URL + "/booking/create", data, "application/json")
-        window.location.replace("/bookingSuccessful")
+        setBtnLoader(false)
 
+        const tempData = {
+            guideName: guideDetails.user.name,
+            contactNumber: guideDetails.phone_number,
+            date: tourDate,
+            time: selectedSlot,
+            peopleCount: noOfPeople,
+            totalAmount: tourCharges * 0.1 + tourCharges
+        }
+
+        window.sessionStorage.setItem("recentBookingDetails", JSON.stringify(tempData))
+
+        window.location.replace("/bookingSuccessful")
     }
 
     return (
@@ -111,6 +122,7 @@ function BookGuidePage() {
             {loader ? (<img
                 src="/loaderHome.gif"
                 style={{width: "100px", height: "100px"}}
+                alt="loader"
             />) : (<div className="bookGuidePageWrapper">
                 <div
                     className="guideTopCard"
@@ -121,7 +133,8 @@ function BookGuidePage() {
                 >
                     <BackButton/>
                     <div className="guideInformation">
-                        {guideDetails && <CardTypeTwo link={"/guide/" + guideDetails.id + "/reviews"} data={guideDetails}/>}
+                        {guideDetails &&
+                        <CardTypeTwo link={"/guide/" + guideDetails.id + "/reviews"} data={guideDetails}/>}
                         <div className="featuredReview flex flex-center">
                             <p
                                 style={{
@@ -130,7 +143,7 @@ function BookGuidePage() {
                                     fontSize: "16px",
                                 }}
                             >
-                                &ldquo; A very Knowledgebale Guide, Punctual and Humble as well &rdquo;
+                                &ldquo; {guideDetails && guideDetails.featured_review} &rdquo;
                             </p>
                         </div>
                     </div>
@@ -159,7 +172,7 @@ function BookGuidePage() {
                                         marginBottom: "20px",
                                     }}
                                 >
-                                    The Complete Tour would take half an hour
+                                    {availableTimings && `The Complete Tour would take ${availableTimings[0].end.split(":")[0] - availableTimings[0].start.split(":")[0]} hours ${availableTimings[0].end.split(":")[1] - availableTimings[0].start.split(":")[1]} minutes`}
                                 </p>
                             </div>
                         )}
@@ -172,6 +185,7 @@ function BookGuidePage() {
                                     value={tourDate}
                                     onChange={handleDateChange}
                                     placeholder="Pick a Date"
+                                    min={new Date().toLocaleDateString()}
                                 />
                                 <h3 style={{marginBottom: "15px", color: "#f78383"}}>
                                     Slots
@@ -201,7 +215,7 @@ function BookGuidePage() {
                                     <i className="fa fa-map-marker-alt"></i> Place
                                 </h4>
                                 <p style={{color: "gray", fontSize: "14px"}}>
-                                    Taj Mahal, Agra
+                                    {guideDetails.place.place_name}, {guideDetails.place.location.city}
                                 </p>
                                 <h4
                                     style={{
@@ -253,10 +267,15 @@ function BookGuidePage() {
                                             id="noOfPeople"
                                             value={noOfPeople}
                                             onChange={(e) => {
+                                                if (parseInt(e.target.value) <= 0) {
+                                                    e.target.value = 1;
+                                                }
+                                                if (parseInt(e.target.value) > 10) {
+                                                    e.target.value = 10;
+                                                }
                                                 setNoOfPeople(e.target.value)
                                                 setTourCharges(e.target.value * perPersonCharge)
-                                            }
-                                            }
+                                            }}
                                             min="1"
                                             max="10"
                                             style={{
@@ -265,7 +284,7 @@ function BookGuidePage() {
                                                 textAlign: "center",
                                                 border: "2px solid #f78383",
                                             }}
-                                        />{" "}
+                                        />
                                         Rs {tourCharges}
                                     </p>
                                 </div>
@@ -286,7 +305,8 @@ function BookGuidePage() {
                                             marginBottom: "10px",
                                         }}
                                     >
-                                        <span style={{marginRight: "8px"}}>5%</span> Rs {0.05 * tourCharges}
+                                        <span
+                                            style={{marginRight: "8px"}}>5%</span> Rs {parseFloat(0.05 * tourCharges).toFixed(2)}
                                     </p>
                                 </div>
                                 <div className="flex flex-sb flex-alignCenter">
@@ -306,7 +326,8 @@ function BookGuidePage() {
                                             marginBottom: "10px",
                                         }}
                                     >
-                                        <span style={{marginRight: "8px"}}>5%</span> Rs {0.05 * tourCharges}
+                                        <span
+                                            style={{marginRight: "8px"}}>5%</span> Rs {parseFloat(0.05 * tourCharges).toFixed(2)}
                                     </p>
                                 </div>
                                 <div
@@ -329,7 +350,7 @@ function BookGuidePage() {
                                             marginBottom: "10px",
                                         }}
                                     >
-                                        {0.1 * tourCharges + tourCharges}
+                                        Rs {0.1 * tourCharges + tourCharges}
                                     </p>
                                 </div>
                             </div>
@@ -351,7 +372,7 @@ function BookGuidePage() {
                                             if (document.getElementsByClassName('active').length === 0) {
                                                 return
                                             } else {
-                                                console.log(selectedSlot)
+
                                             }
                                         }
                                         setSlide((prevData) => prevData + 1)
@@ -362,7 +383,8 @@ function BookGuidePage() {
                             )}
                             {slide === 3 && (
                                 <button className="changeFormBtn next" onClick={handleSubmit}>
-                                    Proceed To Pay
+                                    {btnLoader ? 'Booking...' : 'Proceed To Pay'}
+                                    {btnLoader && <i className="fa fa-spinner fa-pulse" style={{marginLeft: "8px"}}/>}
                                 </button>
                             )}
                         </div>

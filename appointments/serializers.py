@@ -1,4 +1,5 @@
 import datetime
+import time
 
 from django.db import transaction, models
 from rest_framework import serializers
@@ -17,6 +18,8 @@ class AppointmentCreateSerializer(serializers.ModelSerializer):
         fields = ['guide', 'date', 'timing', 'user', 'num_of_people']
 
     def validate(self, attrs):
+        start = time.time()
+
         curr_date = datetime.date.today()
         booking_date = attrs.get('date')
         num_of_people = attrs.get('num_of_people')
@@ -43,16 +46,21 @@ class AppointmentCreateSerializer(serializers.ModelSerializer):
 
         if appointment_count_for_slot + num_of_people > package.maximum_person_limit:
             raise serializers.ValidationError('Slot booked')
-
-        attrs['price'] = package.fee * num_of_people
+        price = package.fee * num_of_people
+        attrs['price'] = price + price*0.1
         attrs['start_time'] = timing_obj.start
         attrs['end_time'] = timing_obj.end
+        end = time.time()
+
+        print("Validate -> ", end-start)
         return attrs
 
     def create(self, validated_data):
-        return super(AppointmentCreateSerializer, self).create(validated_data)
-
-
+        start = time.time()
+        x =  super(AppointmentCreateSerializer, self).create(validated_data)
+        end = time.time()
+        print("create -> ", end - start)
+        return x
 class AppointmentsSerializer(serializers.ModelSerializer):
     timing = TimingsSerializer()
 

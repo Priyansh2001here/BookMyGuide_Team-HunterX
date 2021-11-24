@@ -41,15 +41,27 @@ class LocationListView(generics.ListAPIView):
     serializer_class = serializers.LocationSerializer
     queryset = guide_models.Location.objects.all()
 
+class PlacesListView(APIView):
 
-class PlacesListView(generics.ListAPIView):
-    queryset = guide_models.Place.objects.all()
+    def get_object(self):
+        query__city_name = self.request.query_params.get('city_name')
 
-    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
-    filterset_fields = ['location__state', 'location__city']
+        # if query__city_name:
+        qs = guide_models.Location.objects.filter(city=query__city_name)
+        if qs.exists():
+            return qs.first()
 
-    def get_serializer(self, *args, **kwargs):
-        return serializers.PlaceSerializer(remove_fields=['description'], *args, **kwargs)
+    def get_places_queryset(self, location_id):
+        return guide_models.Place.objects.filter(location_id=location_id)
+
+    def get(self, *args, **kwargs):
+        obj = self.get_object()
+
+        print(obj)
+        return Response({**serializers.LocationSerializer(instance=obj).data,
+                         'places': serializers.PlaceSerializer(self.get_places_queryset(obj.id), many=True, context={
+                             'request': self.request
+                         }).data if obj else []})
 
 
 class PlaceView(generics.RetrieveAPIView):
@@ -101,9 +113,18 @@ class TourGuideDashboard(generics.RetrieveAPIView):
     def get_object(self):
         return self.request.user.partner.tourguide
 
-# @api_view(['GET'])
-# class PartnerIsVerified(request):
-#     user = request
+
+class PackageUpdateView(generics.RetrieveUpdateAPIView):
+    permission_classes = [IsTourGuide]
+
+    def get_serializer(self, *args, **kwargs):
+        return serializers.PackageSerializer(remove_fields=['availability', 'timings'], *args, **kwargs)
+
+    def get_object(self):
+        user = self.request.user
+        queryset = guide_models.Package.objects.get(guide__user__user=user)
+        return queryset
+
 
 class LocationView(generics.RetrieveAPIView):
     serializer_class = serializers.LocationSerializer
